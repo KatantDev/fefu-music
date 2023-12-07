@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from fastapi import HTTPException, Response, Security
 from fastapi_jwt import JwtAccessBearer, JwtAuthorizationCredentials
 from passlib.context import CryptContext
@@ -13,7 +11,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 access_security = JwtAccessBearer(
     secret_key=settings.secret_key,
     auto_error=False,
-    access_expires_delta=timedelta(seconds=10),
+    access_expires_delta=settings.access_token_expire_timedelta,
 )
 refresh_security = RefreshCookie(
     refresh_token_expire_timedelta=settings.refresh_token_expire_timedelta,

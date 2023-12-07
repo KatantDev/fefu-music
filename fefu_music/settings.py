@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     github_client_id: Optional[str] = None
     github_client_secret: Optional[str] = None
 
+    # CORS settings
+    cors_allow_origins: str = "*"
+
     @property
     def db_url(self) -> URL:
         """

@@ -73,5 +73,7 @@ class RefreshCookie(APIKeyCookie):
             httponly=True,
             max_age=seconds_expires,
             path="/api/oauth/token/refresh",
-            domain="192.168.0.105",
+            samesite="none",
+            secure=True,
+            domain=".music.fefu.pro",
         )

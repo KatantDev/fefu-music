@@ -15,8 +15,8 @@ services:
     - traefik.enable=true
     - traefik.http.routers.fefu_music.rule=Host(`${FEFU_MUSIC_TRAEFIK_HOST:-fefu_music.localhost}`)
     - traefik.http.routers.fefu_music.entrypoints=websecure
+    - traefik.http.routers.fefu_music.tls.certresolver=letsencrypt
     - traefik.http.routers.fefu_music.service=fefu_music
-    - traefik.http.routers.fefu_music.tls.certresolver=fefu-resolver
     - traefik.http.services.fefu_music.loadbalancer.server.port=${FEFU_MUSIC_PORT:-8000}
     networks:
     - default
@@ -73,9 +73,13 @@ services:
   traefik:
     image: traefik:latest
     ports:
+    - "80:80"
     - "443:443"
     networks:
     - traefik-shared
+    environment:
+      CF_API_EMAIL: "katantdev@mail.ru"
+      CF_DNS_API_TOKEN: "j5XVY8OUlIaBYjpnP6-8r4YzkWliMGdWPkI-yUKm"
     volumes:
     - "./deploy/traefik.toml:/etc/traefik/traefik.toml"
     - "/var/run/docker.sock:/var/run/docker.sock:ro"

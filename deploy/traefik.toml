@@ -11,7 +11,7 @@
 [entryPoints.websecure]
     address = ":443"
 
-[certificatesResolvers.fefu-resolver.acme]
-    email = "katantdev@mail.ru"
-    storage = "/letsencrypt/acme.json"
-    [certificatesResolvers.fefu-resolver.acme.tlsChallenge]
+[certificatesResolvers.letsencrypt.acme]
+    [certificatesResolvers.letsencrypt.acme.dnsChallenge]
+        provider = "cloudflare"
+        delayBeforeCheck = 0

@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
 from fefu_music.db.config import TORTOISE_CONFIG
+from fefu_music.settings import settings
 from fefu_music.web.api.router import api_router
 from fefu_music.web.lifetime import register_shutdown_event, register_startup_event
 
@@ -30,9 +31,9 @@ def get_app() -> FastAPI:
     # CORS
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://192.168.0.16:5173"],
+        allow_origins=settings.cors_allow_origins,
         allow_credentials=True,
-        allow_methods=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
 
