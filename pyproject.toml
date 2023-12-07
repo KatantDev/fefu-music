@@ -1,0 +1,107 @@
+[tool.poetry]
+name = "fefu_music"
+version = "0.1.0"
+description = ""
+authors = [
+
+]
+maintainers = [
+
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.1"
+uvicorn = { version = "^0.24", extras = ["standard"] }
+pydantic = { version = "^2", extras = ["email"] }
+pydantic-settings = "^2"
+yarl = "^1.9.2"
+ujson = "^5.8.0"
+tortoise-orm = "^0.20.0"
+aerich = "^0.7.1"
+asyncpg = "^0.29.0"
+httptools = "^0.6.0"
+taskiq = { version = "^0", extras = ["reload"] }
+taskiq-fastapi = "^0"
+pyzmq = "^25"
+yandex-music = "^2.1.1"
+fastapi-jwt = "^0.2.0"
+passlib = "^1.7.4"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.1"
+flake8 = "~4.0.1"
+mypy = "^1.1.1"
+isort = "^5.11.4"
+pre-commit = "^3.0.1"
+wemake-python-styleguide = "^0.17.0"
+black = "^22.12.0"
+autoflake = "^1.6.1"
+pytest-cov = "^4.0.0"
+anyio = "^3.6.2"
+pytest-env = "^0.8.1"
+asynctest = "^0.13.0"
+nest-asyncio = "^1.5.6"
+httpx = "^0.23.3"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["fefu_music",]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+allow_subclassing_any = true
+allow_untyped_calls = true
+pretty = true
+show_error_codes = true
+implicit_reexport = true
+allow_untyped_decorators = true
+warn_unused_ignores = false
+warn_return_any = false
+namespace_packages = true
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore:.*unclosed.*:ResourceWarning",
+]
+env = [
+    "FEFU_MUSIC_ENVIRONMENT=pytest",
+    "FEFU_MUSIC_DB_BASE=fefu_music_test",
+]
+[tool.aerich]
+tortoise_orm = "fefu_music.db.config.TORTOISE_CONFIG"
+location = "./fefu_music/db/migrations"
+src_folder = "./fefu_music"
+
+[fastapi-template.options]
+project_name = "fefu_music"
+api_type = "rest"
+enable_redis = "None"
+enable_rmq = "None"
+ci_type = "github"
+enable_migrations = "True"
+enable_taskiq = "True"
+enable_kube = "None"
+kube_name = "fefu-music"
+enable_routers = "True"
+enable_kafka = "None"
+enable_loguru = "None"
+traefik_labels = "True"
+add_dummy = "True"
+orm = "tortoise"
+self_hosted_swagger = "None"
+prometheus_enabled = "None"
+sentry_enabled = "None"
+otlp_enabled = "None"
+pydanticv1 = "None"
+gunicorn = "None"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

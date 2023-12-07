@@ -1,0 +1,1 @@
+"""fefu_music package."""

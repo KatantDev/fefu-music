@@ -1,0 +1,91 @@
+version: '3.9'
+
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+      target: prod
+    image: fefu_music:${FEFU_MUSIC_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    labels:
+      # Enables traefik for this container.
+    - traefik.enable=true
+    - traefik.http.routers.fefu_music.rule=Host(`${FEFU_MUSIC_TRAEFIK_HOST:-fefu_music.localhost}`)
+    - traefik.http.routers.fefu_music.entrypoints=websecure
+    - traefik.http.routers.fefu_music.service=fefu_music
+    - traefik.http.routers.fefu_music.tls.certresolver=fefu-resolver
+    - traefik.http.services.fefu_music.loadbalancer.server.port=${FEFU_MUSIC_PORT:-8000}
+    networks:
+    - default
+    - traefik-shared
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FEFU_MUSIC_HOST: 0.0.0.0
+      FEFU_MUSIC_DB_HOST: fefu_music-db
+      FEFU_MUSIC_DB_PORT: 5432
+      FEFU_MUSIC_DB_USER: fefu_music
+      FEFU_MUSIC_DB_PASS: fefu_music
+      FEFU_MUSIC_DB_BASE: fefu_music
+
+  taskiq-worker:
+    <<: *main_app
+    labels: []
+    command:
+    - taskiq
+    - worker
+    - fefu_music.tkq:broker
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: fefu_music-db
+    environment:
+      POSTGRES_PASSWORD: "fefu_music"
+      POSTGRES_USER: "fefu_music"
+      POSTGRES_DB: "fefu_music"
+    volumes:
+    - fefu_music-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U fefu_music
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: fefu_music:${FEFU_MUSIC_VERSION:-latest}
+    restart: "no"
+    command: aerich upgrade
+    environment:
+      FEFU_MUSIC_DB_HOST: fefu_music-db
+      FEFU_MUSIC_DB_PORT: 5432
+      FEFU_MUSIC_DB_USER: fefu_music
+      FEFU_MUSIC_DB_PASS: fefu_music
+      FEFU_MUSIC_DB_BASE: fefu_music
+    depends_on:
+      db:
+        condition: service_healthy
+
+  traefik:
+    image: traefik:latest
+    ports:
+    - "443:443"
+    networks:
+    - traefik-shared
+    volumes:
+    - "./deploy/traefik.toml:/etc/traefik/traefik.toml"
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+
+volumes:
+  fefu_music-db-data:
+    name: fefu_music-db-data
+
+networks:
+  # Network for traefik.
+  traefik-shared:
+    name: traefik-shared

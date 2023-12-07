@@ -1,0 +1,17 @@
+[log]
+    level = "INFO"
+
+[api]
+    dashboard = true
+
+[providers.docker]
+    network = "traefik-shared"
+    exposedByDefault = false
+
+[entryPoints.websecure]
+    address = ":443"
+
+[certificatesResolvers.fefu-resolver.acme]
+    email = "katantdev@mail.ru"
+    storage = "/letsencrypt/acme.json"
+    [certificatesResolvers.fefu-resolver.acme.tlsChallenge]
