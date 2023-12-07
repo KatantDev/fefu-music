@@ -2,7 +2,7 @@ import enum
 from datetime import timedelta
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Optional
+from typing import List, Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     github_client_secret: Optional[str] = None
 
     # CORS settings
-    cors_allow_origins: str = "*"
+    cors_allow_origins: List[str] = ["*"]
 
     @property
     def db_url(self) -> URL:

@@ -1,10 +1,8 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, Query, Security
-from fastapi_jwt import JwtAuthorizationCredentials
+from fastapi import APIRouter, Depends, Query
 from yandex_music import ClientAsync
 
-from fefu_music.services.auth.utils import validate_access_security
 from fefu_music.services.yandex_music_api import utils
 from fefu_music.services.yandex_music_api.dependencies import get_yandex_music_client
 from fefu_music.web.api.landing.schema import AlbumDTO, ArtistShortDTO, TrackShortDTO
@@ -19,7 +17,6 @@ router = APIRouter()
 async def get_chart(
     limit: int = Query(default=10, ge=1, le=100),  # noqa: WPS432
     offset: int = Query(default=0, ge=0, le=100),  # noqa: WPS432
-    _: JwtAuthorizationCredentials = Security(validate_access_security),
     yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
 ) -> List[TrackShortDTO]:
     """
@@ -33,7 +30,6 @@ async def get_chart(
                   Must be between 1 and 100.
     :param offset: The number of tracks to skip from the start. Default to 0.
                    Must be between 0 and 100.
-    :param _: The credentials from the access token.
     :param yandex_music_client: An instance of the Yandex Music client.
     :return: A list of track data transfer objects (DTOs).
     """
