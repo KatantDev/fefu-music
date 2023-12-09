@@ -89,8 +89,16 @@ async def get_new_releases(
             AlbumDTO(
                 id=album.id,
                 title=album.title,
+                artists=[
+                    ArtistShortDTO(
+                        id=artist.id,
+                        name=artist.name,
+                    )
+                    for artist in album.artists
+                ],
                 cover_url=album.get_cover_url("400x400"),
                 track_count=album.track_count,
+                release_date=album.release_date,
             ),
         )
     return album_dtos

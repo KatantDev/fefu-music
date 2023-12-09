@@ -28,3 +28,5 @@ class AlbumDTO(BaseModel):
     title: str
     cover_url: HttpUrl
     track_count: int
+    artists: List[ArtistShortDTO]
+    release_date: str
