@@ -5,7 +5,8 @@ from yandex_music import ClientAsync
 
 from fefu_music.services.yandex_music_api import utils
 from fefu_music.services.yandex_music_api.dependencies import get_yandex_music_client
-from fefu_music.web.api.landing.schema import AlbumDTO, ArtistShortDTO, TrackShortDTO
+from fefu_music.web.api.landing.schema import AlbumDTO
+from fefu_music.web.api.schema import TrackShortDTO
 
 router = APIRouter()
 
@@ -43,13 +44,7 @@ async def get_chart(
             TrackShortDTO(
                 id=track_short.id,
                 title=track_short.title,
-                artists=[
-                    ArtistShortDTO(
-                        id=artist.id,
-                        name=artist.name,
-                    )
-                    for artist in track_short.artists
-                ],
+                artists=track_short.artists,
                 duration_ms=track_short.duration_ms,
                 duration_text=utils.format_duration(track_short.duration_ms),
                 cover_url=track_short.get_cover_url("100x100"),
@@ -89,13 +84,7 @@ async def get_new_releases(
             AlbumDTO(
                 id=album.id,
                 title=album.title,
-                artists=[
-                    ArtistShortDTO(
-                        id=artist.id,
-                        name=artist.name,
-                    )
-                    for artist in album.artists
-                ],
+                artists=album.artists,
                 cover_url=album.get_cover_url("400x400"),
                 track_count=album.track_count,
                 release_date=album.release_date,
