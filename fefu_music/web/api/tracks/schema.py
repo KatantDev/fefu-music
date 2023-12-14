@@ -19,4 +19,6 @@ class DownloadInfoDTO(BaseModel):
 class TrackDTO(TrackShortDTO):
     """DTO to represent detail information about track."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     download_info: List[DownloadInfoDTO]

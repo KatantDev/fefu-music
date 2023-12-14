@@ -1,9 +1,9 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
-from yandex_music import ClientAsync, DownloadInfo
+from yandex_music import ClientAsync, DownloadInfo, Track
 
-from fefu_music.services.yandex_music_api import get_yandex_music_client, utils
+from fefu_music.services.yandex_music_api import get_yandex_music_client
 from fefu_music.web.api.tracks.schema import DownloadInfoDTO, TrackDTO
 
 router = APIRouter()
@@ -16,7 +16,7 @@ router = APIRouter()
 async def get_track(
     track_id: int,
     yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> TrackDTO:
+) -> Track:
     """
     Asynchronous function to get a track from Yandex Music.
 
@@ -28,16 +28,8 @@ async def get_track(
     :return: A TrackDTO object containing the track data and download information.
     """
     track = (await yandex_music_client.tracks(track_id))[0]
-    download_info = await track.get_download_info_async(get_direct_links=True)
-    return TrackDTO(
-        id=track.id,
-        title=track.title,
-        artists=track.artists,
-        duration_ms=track.duration_ms,
-        duration_text=utils.format_duration(track.duration_ms),
-        cover_url=track.get_cover_url("400x400"),
-        download_info=download_info,
-    )
+    track.download_info = await track.get_download_info_async(get_direct_links=True)
+    return track
 
 
 @router.get(

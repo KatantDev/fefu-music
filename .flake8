@@ -113,3 +113,7 @@ exclude =
   ./var,
   ./.vscode,
   *migrations*,
+
+classmethod-decorators =
+  classmethod
+  model_validator

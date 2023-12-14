@@ -1,12 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from yandex_music import ClientAsync
+from yandex_music import Album, ClientAsync, Track
 
-from fefu_music.services.yandex_music_api import utils
 from fefu_music.services.yandex_music_api.dependencies import get_yandex_music_client
-from fefu_music.web.api.landing.schema import AlbumDTO
-from fefu_music.web.api.schema import TrackShortDTO
+from fefu_music.web.api.schema import AlbumShortDTO, TrackShortDTO
 
 router = APIRouter()
 
@@ -19,7 +17,7 @@ async def get_chart(
     limit: int = Query(default=10, ge=1, le=100),  # noqa: WPS432
     offset: int = Query(default=0, ge=0, le=100),  # noqa: WPS432
     yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> List[TrackShortDTO]:
+) -> List[Track]:
     """
     Asynchronous function to get a chart of tracks from Yandex Music.
 
@@ -37,31 +35,18 @@ async def get_chart(
     chart_info = await yandex_music_client.chart(
         params={"limit": limit} if offset == 0 else {},
     )
-    track_dtos = []
-    for track in chart_info.chart.tracks[offset : offset + limit]:
-        track_short = track.track
-        track_dtos.append(
-            TrackShortDTO(
-                id=track_short.id,
-                title=track_short.title,
-                artists=track_short.artists,
-                duration_ms=track_short.duration_ms,
-                duration_text=utils.format_duration(track_short.duration_ms),
-                cover_url=track_short.get_cover_url("100x100"),
-            ),
-        )
-    return track_dtos
+    return [track.track for track in chart_info.chart.tracks[offset : offset + limit]]
 
 
 @router.get(
     path="/new-releases",
-    response_model=List[AlbumDTO],
+    response_model=List[AlbumShortDTO],
 )
 async def get_new_releases(
     limit: int = Query(default=10, ge=1, le=50),  # noqa: WPS432
     offset: int = Query(default=0, ge=0, le=50),  # noqa: WPS432
     yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> List[AlbumDTO]:
+) -> List[Album]:
     """
     Asynchronous function to get new album releases from Yandex Music.
 
@@ -78,16 +63,4 @@ async def get_new_releases(
     """
     new_releases = await yandex_music_client.new_releases()
     new_releases = new_releases.new_releases[offset : offset + limit]
-    album_dtos = []
-    for album in await yandex_music_client.albums(new_releases):
-        album_dtos.append(
-            AlbumDTO(
-                id=album.id,
-                title=album.title,
-                artists=album.artists,
-                cover_url=album.get_cover_url("400x400"),
-                track_count=album.track_count,
-                release_date=album.release_date,
-            ),
-        )
-    return album_dtos
+    return await yandex_music_client.albums(new_releases)
