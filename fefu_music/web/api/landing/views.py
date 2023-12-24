@@ -1,10 +1,11 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from yandex_music import Album, ClientAsync, Track
+from ymdantic import YMClient, models
 
-from fefu_music.services.yandex_music_api.dependencies import get_yandex_music_client
-from fefu_music.web.api.schema import AlbumShortDTO, TrackShortDTO
+from fefu_music.services.yandex_music_api.dependencies import get_ymclient
+from fefu_music.web.api.landing.schema import NewReleaseDTO
+from fefu_music.web.api.schema import TrackShortDTO
 
 router = APIRouter()
 
@@ -16,8 +17,8 @@ router = APIRouter()
 async def get_chart(
     limit: int = Query(default=10, ge=1, le=100),  # noqa: WPS432
     offset: int = Query(default=0, ge=0, le=100),  # noqa: WPS432
-    yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> List[Track]:
+    yandex_music_client: YMClient = Depends(get_ymclient),
+) -> List[models.TrackType]:
     """
     Asynchronous function to get a chart of tracks from Yandex Music.
 
@@ -32,21 +33,22 @@ async def get_chart(
     :param yandex_music_client: An instance of the Yandex Music client.
     :return: A list of track data transfer objects (DTOs).
     """
-    chart_info = await yandex_music_client.chart(
-        params={"limit": limit} if offset == 0 else {},
+    chart_info = await yandex_music_client.get_chart(
+        limit=limit if offset == 0 else None,
     )
     return [track.track for track in chart_info.chart.tracks[offset : offset + limit]]
 
 
 @router.get(
     path="/new-releases",
-    response_model=List[AlbumShortDTO],
+    response_model=List[NewReleaseDTO],
+    response_model_exclude_none=True,
 )
 async def get_new_releases(
     limit: int = Query(default=10, ge=1, le=50),  # noqa: WPS432
     offset: int = Query(default=0, ge=0, le=50),  # noqa: WPS432
-    yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> List[Album]:
+    yandex_music_client: YMClient = Depends(get_ymclient),
+) -> List[models.NewRelease]:
     """
     Asynchronous function to get new album releases from Yandex Music.
 
@@ -61,6 +63,5 @@ async def get_new_releases(
     :param yandex_music_client: An instance of the Yandex Music client.
     :return: A list of album data transfer objects (DTOs).
     """
-    new_releases = await yandex_music_client.new_releases()
-    new_releases = new_releases.new_releases[offset : offset + limit]
-    return await yandex_music_client.albums(new_releases)
+    new_releases = await yandex_music_client.get_editorial_new_releases()
+    return new_releases[offset : offset + limit]

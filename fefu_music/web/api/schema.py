@@ -1,9 +1,12 @@
-from typing import List
+from typing import List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, HttpUrl, model_validator
-from yandex_music import Album, Track
+from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
+from ymdantic.models import Album, Artist, TrackType
+from ymdantic.models.landing.landing_artist import LandingArtist
 
 from fefu_music.services.yandex_music_api import utils
+
+ArtistType = Union[LandingArtist, Artist]
 
 
 class ArtistShortDTO(BaseModel):
@@ -13,6 +16,19 @@ class ArtistShortDTO(BaseModel):
 
     id: int
     name: str
+    cover_url: HttpUrl
+
+    @model_validator(mode="before")
+    def cover_url_validator(cls, obj: Artist) -> Artist:
+        """
+        Inject cover url to object.
+
+        :param obj: The artist to inject.
+        :return: The artist with injected field.
+        """
+        return obj.model_copy(
+            update={"cover_url": obj.get_cover_image_url("100x100")},
+        )
 
 
 class TrackShortDTO(BaseModel):
@@ -22,22 +38,31 @@ class TrackShortDTO(BaseModel):
 
     id: int
     title: str
-    cover_url: HttpUrl
+    cover_url: Optional[HttpUrl] = None
     duration_ms: int
-    duration_text: str
     artists: List[ArtistShortDTO]
 
     @model_validator(mode="before")
-    def validate_model(cls, track: Track) -> Track:
+    def cover_url_validator(cls, obj: TrackType) -> TrackType:
         """
-        Validate the model.
+        Inject cover url to object.
 
-        :param track: The track to validate.
-        :return: The validated track.
+        :param obj: The track to inject.
+        :return: The track with injected field.
         """
-        track.duration_text = utils.format_duration(track.duration_ms)
-        track.cover_url = track.get_cover_url("100x100")
-        return track
+        return obj.model_copy(
+            update={"cover_url": obj.get_cover_image_url("100x100")},
+        )
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def duration_text(self) -> str:
+        """
+        Get duration text by formatting duration in milliseconds.
+
+        :return: The duration text.
+        """
+        return utils.format_duration(self.duration_ms)
 
 
 class AlbumShortDTO(BaseModel):
@@ -53,12 +78,13 @@ class AlbumShortDTO(BaseModel):
     release_date: str
 
     @model_validator(mode="before")
-    def validate_model(cls, album: Album) -> Album:
+    def cover_url_validator(cls, obj: Album) -> Album:
         """
-        Validate the model.
+        Inject cover url to object.
 
-        :param album: The album to validate.
-        :return: The validated album.
+        :param obj: The album to inject.
+        :return: The album with injected field.
         """
-        album.cover_url = album.get_cover_url("400x400")
-        return album
+        return obj.model_copy(
+            update={"cover_url": obj.get_cover_image_url("400x400")},
+        )

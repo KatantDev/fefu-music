@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from yandex_music import Album, ClientAsync
+from ymdantic import YMClient, models
 
-from fefu_music.services.yandex_music_api import get_yandex_music_client
+from fefu_music.services.yandex_music_api import get_ymclient
 from fefu_music.web.api.albums.schema import AlbumDTO
 
 router = APIRouter()
@@ -13,8 +13,8 @@ router = APIRouter()
 )
 async def get_album(
     album_id: int,
-    yandex_music_client: ClientAsync = Depends(get_yandex_music_client),
-) -> Album:
+    ym_client: YMClient = Depends(get_ymclient),
+) -> models.Album:
     """
     Asynchronous function to get an album from Yandex Music.
 
@@ -22,7 +22,7 @@ async def get_album(
     the album along with its tracks.
 
     :param album_id: The ID of the album to fetch.
-    :param yandex_music_client: An instance of the Yandex Music client.
+    :param ym_client: An instance of the Yandex Music client.
     :return: An AlbumDTO object containing the album data and its tracks.
     """
-    return await yandex_music_client.albums_with_tracks(album_id)
+    return await ym_client.get_album_with_tracks(album_id)

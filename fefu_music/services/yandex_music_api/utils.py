@@ -14,8 +14,7 @@ def format_duration(duration_ms: int) -> str:
     duration_parts = []
     if hours > 0:
         duration_parts.append(f"{hours}".zfill(2))
-    if minutes > 0 or hours > 0:
-        duration_parts.append(f"{minutes}".zfill(2))
+    duration_parts.append(f"{minutes}".zfill(2))
     duration_parts.append(f"{seconds}".zfill(2))
 
     return ":".join(duration_parts)

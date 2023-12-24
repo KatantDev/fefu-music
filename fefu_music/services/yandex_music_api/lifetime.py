@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from yandex_music import ClientAsync
+from ymdantic import YMClient
 
 from fefu_music.settings import settings
 
@@ -14,4 +14,5 @@ def startup(app: FastAPI) -> None:
 
     :param app: The FastAPI application.
     """
-    app.state.yandex_music_client = ClientAsync(token=settings.yandex_music_token)
+    if settings.yandex_music_token:
+        app.state.ym_client = YMClient(token=settings.yandex_music_token)

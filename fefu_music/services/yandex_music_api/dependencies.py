@@ -1,8 +1,8 @@
-import yandex_music
 from fastapi import Request
+from ymdantic import YMClient
 
 
-async def get_yandex_music_client(request: Request) -> yandex_music.ClientAsync:
+async def get_ymclient(request: Request) -> YMClient:
     """
     Asynchronous function to get the Yandex Music client from the application state.
 
@@ -13,4 +13,4 @@ async def get_yandex_music_client(request: Request) -> yandex_music.ClientAsync:
     :param request: The request object associated with the current HTTP request.
     :return: The Yandex Music client stored in the application state.
     """
-    return request.app.state.yandex_music_client
+    return request.app.state.ym_client

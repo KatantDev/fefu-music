@@ -1,7 +1,7 @@
 from typing import List
 
 from pydantic import ConfigDict, model_validator
-from yandex_music import Album
+from ymdantic.models import Album
 
 from fefu_music.web.api.schema import AlbumShortDTO, TrackShortDTO
 
@@ -14,12 +14,13 @@ class AlbumDTO(AlbumShortDTO):
     tracks: List[TrackShortDTO]
 
     @model_validator(mode="before")
-    def validate_tracks(cls, album: Album) -> Album:
+    def tracks_validator(cls, obj: Album) -> Album:
         """
         Validate the tracks.
 
-        :param album: The album to validate.
+        :param obj: The album to validate.
         :return: The validated album.
         """
-        album.tracks = [track for volume in album.volumes for track in volume]
-        return album
+        return obj.model_copy(
+            update={"tracks": [track for volume in obj.volumes for track in volume]},
+        )

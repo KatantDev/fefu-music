@@ -11,9 +11,9 @@ maintainers = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-fastapi = "^0.104.1"
-uvicorn = { version = "^0.24", extras = ["standard"] }
+python = "^3.10"
+fastapi = "^0.105.0"
+uvicorn = { version = "^0.25", extras = ["standard"] }
 pydantic = { version = "^2", extras = ["email"] }
 pydantic-settings = "^2"
 yarl = "^1.9.2"
@@ -25,9 +25,9 @@ httptools = "^0.6.0"
 taskiq = { version = "^0", extras = ["reload"] }
 taskiq-fastapi = "^0"
 pyzmq = "^25"
-yandex-music = "^2.1.1"
 fastapi-jwt = "^0.2.0"
 passlib = "^1.7.4"
+ymdantic = "^0.1.5"
 
 
 [tool.poetry.dev-dependencies]

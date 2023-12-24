@@ -72,6 +72,10 @@ ignore =
   WPS473,
   ; too many no-cover comments.
   WPS403,
+  ; Found a too complex `f` string
+  WPS237
+  ; Found `%` string formatting
+  WPS323,
 
 per-file-ignores =
   ; all tests
