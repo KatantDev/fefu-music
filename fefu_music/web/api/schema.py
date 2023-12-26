@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
@@ -75,7 +76,7 @@ class AlbumShortDTO(BaseModel):
     cover_url: HttpUrl
     track_count: int
     artists: List[ArtistShortDTO]
-    release_date: str
+    release_date: datetime
 
     @model_validator(mode="before")
     def cover_url_validator(cls, obj: Album) -> Album:
