@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
 from ymdantic.models import Album, Artist, LandingArtist, TrackType
@@ -16,7 +16,7 @@ class ArtistShortDTO(BaseModel):
 
     id: int
     name: str
-    cover_url: HttpUrl
+    cover_url: Optional[HttpUrl] = None
 
     @model_validator(mode="before")
     def cover_url_validator(cls, obj: Artist) -> Artist:
@@ -37,6 +37,16 @@ class TrackShortDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    available: bool
+    type: Literal[
+        "music",
+        "asmr",
+        "audiobook",
+        "noise",
+        "fairy-tale",
+        "podcast-episode",
+        "comment",
+    ]
     title: str
     cover_url: Optional[HttpUrl] = None
     duration_ms: int
@@ -72,7 +82,7 @@ class AlbumShortDTO(BaseModel):
 
     id: int
     title: str
-    cover_url: HttpUrl
+    cover_url: Optional[HttpUrl] = None
     track_count: int
     artists: List[ArtistShortDTO]
     release_date: datetime
