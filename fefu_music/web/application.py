@@ -8,7 +8,11 @@ from tortoise.contrib.fastapi import register_tortoise
 from fefu_music.db.config import TORTOISE_CONFIG
 from fefu_music.settings import settings
 from fefu_music.web.api.router import api_router
-from fefu_music.web.lifetime import register_shutdown_event, register_startup_event
+from fefu_music.web.lifetime import (
+    register_exception_handler,
+    register_shutdown_event,
+    register_startup_event,
+)
 
 
 def get_app() -> FastAPI:
@@ -40,6 +44,9 @@ def get_app() -> FastAPI:
     # Adds startup and shutdown events.
     register_startup_event(app)
     register_shutdown_event(app)
+
+    # Registers exception handler.
+    register_exception_handler(app)
 
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")

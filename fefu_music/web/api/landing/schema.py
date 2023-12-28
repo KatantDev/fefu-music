@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, model_validator
-from ymdantic.models import NewRelease
-from ymdantic.models.landing.landing_album import LandingAlbum
-from ymdantic.models.landing.landing_artist import LandingArtist
+from ymdantic.models import LandingAlbum, LandingArtist, NewRelease
+
+from fefu_music.web.api.schema import PlaylistShortDTO
 
 
 class LandingAlbumDTO(BaseModel):
@@ -73,3 +73,10 @@ class NewReleaseDTO(BaseModel):
         return obj.model_copy(
             update={"cover_url": obj.get_cover_image_url("400x400")},
         )
+
+
+class LikedPlaylistDTO(BaseModel):
+    """DTO to represent short information about the liked playlist."""
+
+    playlist: PlaylistShortDTO
+    likes_count: int

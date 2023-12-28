@@ -1,10 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from ymdantic import YMClient, models
+from ymdantic import YMClient, enums, models
 
 from fefu_music.services.yandex_music_api.dependencies import get_ymclient
-from fefu_music.web.api.landing.schema import NewReleaseDTO
+from fefu_music.web.api.landing.schema import LikedPlaylistDTO, NewReleaseDTO
 from fefu_music.web.api.schema import TrackShortDTO
 
 router = APIRouter()
@@ -63,5 +63,27 @@ async def get_new_releases(
     :param yandex_music_client: An instance of the Yandex Music client.
     :return: A list of album data transfer objects (DTOs).
     """
-    new_releases = await yandex_music_client.get_editorial_new_releases()
+    new_releases = await yandex_music_client.get_editorial_new_releases(
+        block_type=enums.EditorialNewReleasesEnum.ALL_ALBUMS_OF_THE_MONTH,
+    )
     return new_releases[offset : offset + limit]
+
+
+@router.get(
+    path="/playlists/new-year",
+    response_model=List[LikedPlaylistDTO],
+)
+async def get_new_year_playlists(
+    yandex_music_client: YMClient = Depends(get_ymclient),
+) -> List[models.LandingLikedPlaylistItemData]:
+    """
+    Asynchronous function to get new year playlists from Yandex Music.
+
+    This function uses the Yandex Music API to fetch new year playlists.
+
+    :param yandex_music_client: An instance of the Yandex Music client.
+    :return: A list of playlist data transfer objects (DTOs).
+    """
+    return await yandex_music_client.get_editorial_compilation(  # type: ignore
+        block_type=enums.EditorialCompilationEnum.ALL_NEWYEAR,
+    )

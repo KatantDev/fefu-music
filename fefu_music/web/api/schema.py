@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
-from ymdantic.models import Album, Artist, TrackType
-from ymdantic.models.landing.landing_artist import LandingArtist
+from ymdantic.models import Album, Artist, LandingArtist, TrackType
 
 from fefu_music.services.yandex_music_api import utils
 
@@ -77,6 +76,29 @@ class AlbumShortDTO(BaseModel):
     track_count: int
     artists: List[ArtistShortDTO]
     release_date: datetime
+
+    @model_validator(mode="before")
+    def cover_url_validator(cls, obj: Album) -> Album:
+        """
+        Inject cover url to object.
+
+        :param obj: The album to inject.
+        :return: The album with injected field.
+        """
+        return obj.model_copy(
+            update={"cover_url": obj.get_cover_image_url("400x400")},
+        )
+
+
+class PlaylistShortDTO(BaseModel):
+    """DTO to represent short information about the playlist."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    uid: int
+    kind: int
+    title: str
+    cover_url: HttpUrl
 
     @model_validator(mode="before")
     def cover_url_validator(cls, obj: Album) -> Album:
